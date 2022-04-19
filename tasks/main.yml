@@ -1,0 +1,23 @@
+---
+- name: Copy scripts
+  ansible.builtin.copy:
+    content: "{{ item.content | default(omit) }}"
+    src: "{{ item.src | default(omit) }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
+    mode: "{{ item.mode | default('0755') }}"
+  loop: "{{ systemd_scripts }}"
+
+- name: Copy systemd units
+  ansible.builtin.copy:
+    content: "{{ item.content | default(omit) }}"
+    src: "{{ item.src | default(omit) }}"
+    dest: "/etc/systemd/system/{{ item.name }}"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ systemd_units }}"
+  register: __systemd_units_copied
+  notify:
+    - restart systemd units
