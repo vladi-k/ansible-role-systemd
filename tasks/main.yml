@@ -8,6 +8,8 @@
     group: "{{ item.group | default(omit) }}"
     mode: "{{ item.mode | default('0755') }}"
   loop: "{{ systemd_scripts }}"
+  tags:
+    - systemd_scripts
 
 - name: Copy systemd units
   ansible.builtin.copy:
@@ -16,8 +18,22 @@
     dest: "/etc/systemd/system/{{ item.name }}"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   loop: "{{ systemd_units }}"
-  register: __systemd_units_copied
   notify:
-    - restart systemd units
+    - Reload systemd
+  tags:
+    - systemd_units
+
+- name: Configure systemd units
+  ansible.builtin.systemd:
+    name: "{{ item.name }}"
+    enabled: "{{ item.enabled | default(omit) }}"
+    force: "{{ item.force | default(omit) }}"
+    masked: "{{ item.masked | default(omit) }}"
+    no_block: "{{ item.no_block | default(omit) }}"
+    scope: "{{ item.scope | default(omit) }}"
+    state: "{{ item.state | default(omit) }}"
+  loop: "{{ systemd_units }}"
+  tags:
+    - systemd_units
