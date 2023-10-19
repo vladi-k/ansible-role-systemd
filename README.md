@@ -37,6 +37,8 @@ systemd_units:
 
       [Install]
       WantedBy=default.target
+    enabled: true
+    state: started
   - name: my-custom.timer
     content: |
       [Unit]

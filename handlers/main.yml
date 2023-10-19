@@ -1,9 +1,4 @@
 ---
-- name: restart systemd units
+- name: Reload systemd
   ansible.builtin.systemd:
-    name: "{{ item.item.name }}"
-    state: restarted
     daemon_reload: true
-    enabled: true
-  when: item.changed
-  loop: "{{ __systemd_units_copied.results | default([]) }}"
